@@ -36,7 +36,7 @@ class AudioDataset(Dataset):
         waveform = load_audio(self.files[idx])
         return waveform
 
-# VQ-VAE модель
+# VQ-VAE модель (simple VQ-VAE)
 class VectorQuantizer(nn.Module):
     def __init__(self, num_embeddings, embedding_dim, commitment_cost):
         super(VectorQuantizer, self).__init__()
