@@ -84,8 +84,30 @@ class VQVAE(nn.Module):
 # Обучение модели
 model = VQVAE().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-dataset = AudioDataset('/content/C418_samples')
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+scheduler = CosineAnnealingLR(optimizer, T_max=10)
+dataset = AudioDataset(r'E:\C418_all')
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
+
+class EarlyStopping:
+    def __init__(self, patience=5, delta=1e-5):
+        self.patience = patience
+        self.delta = delta
+        self.best_loss = float("inf")
+        self.counter = 0
+
+    def check(self, loss):
+        if loss < self.best_loss - self.delta:
+            self.best_loss = loss
+            self.counter = 0
+        else:
+            self.counter += 1
+        return self.counter >= self.patience
+
+early_stopping = EarlyStopping(patience=3)
 
 for epoch in range(epochs):
     total_loss = 0
