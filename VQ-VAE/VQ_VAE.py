@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-from MySamples import duration, target_dir, target_sr
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,7 +5,6 @@ import torchaudio
 import os
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
-<<<<<<< HEAD
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 
@@ -21,17 +16,6 @@ target_sr = 44100
 duration = 4
 batch_size = 16
 epochs = 20
-=======
-
-# Гиперпараметры
-latent_dim = 64
-num_embeddings = 512
-commitment_cost = 0.25
-target_sr = 44100
-duration = 4
-batch_size = 32
-epochs = 10
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_audio(file_path):
@@ -44,11 +28,7 @@ def load_audio(file_path):
 class AudioDataset(Dataset):
     def __init__(self, root_dir):
         self.files = [os.path.join(root_dir, f) for f in os.listdir(root_dir) if f.endswith('.wav')]
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
     def __len__(self):
         return len(self.files)
 
@@ -65,17 +45,10 @@ class VectorQuantizer(nn.Module):
         self.commitment_cost = commitment_cost
         self.embeddings = nn.Embedding(num_embeddings, embedding_dim)
         self.embeddings.weight.data.uniform_(-1.0 / num_embeddings, 1.0 / num_embeddings)
-<<<<<<< HEAD
 
     def forward(self, x):
         x_flat = x.permute(0, 2, 1).reshape(-1, self.embedding_dim)  # [B*T, D]
         distances = (torch.sum(x_flat ** 2, dim=1, keepdim=True)
-=======
-    
-    def forward(self, x):
-        x_flat = x.permute(0, 2, 1).reshape(-1, self.embedding_dim)  # [B*T, D]
-        distances = (torch.sum(x_flat ** 2, dim=1, keepdim=True) 
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
                      + torch.sum(self.embeddings.weight ** 2, dim=1)
                      - 2 * torch.matmul(x_flat, self.embeddings.weight.t()))
         encoding_indices = torch.argmin(distances, dim=1)
@@ -89,15 +62,10 @@ class VQVAE(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv1d(in_channels, 32, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
-<<<<<<< HEAD
             nn.Dropout(p=0.2),
             nn.Conv1d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
             nn.Dropout(p=0.2),
-=======
-            nn.Conv1d(32, 64, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
             nn.Conv1d(64, latent_dim, kernel_size=4, stride=2, padding=1),
             nn.ReLU()
         )
@@ -105,7 +73,6 @@ class VQVAE(nn.Module):
         self.decoder = nn.Sequential(
             nn.ConvTranspose1d(latent_dim, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
-<<<<<<< HEAD
             nn.Dropout(p=0.2),
             nn.ConvTranspose1d(64, 32, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
@@ -181,45 +148,10 @@ for epoch in range(20):
     val_loss, val_cosine = validate(model, val_loader, F.mse_loss)
     scheduler.step()
     if early_stopping.check(val_loss):
-        print(f"Early stopping on {epoch + 1} epoch.")
+        print(f"Early stopping на {epoch + 1} эпохе.")
         break
     print(f"Epoch {epoch+1}: Train Loss: {train_loss/len(train_loader):.6f}, Train Cosine: {train_cosine/len(train_loader):.6f}")
     print(f"           Val Loss: {val_loss:.6f}, Val Cosine: {val_cosine:.6f}")
     if epoch % 5 == 0:
         torch.save(model.state_dict(), f'vqvae_model_{epoch}.pth')
 torch.save(model.state_dict(), 'final_vqvae_model.pth')
-=======
-            nn.ConvTranspose1d(64, 32, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose1d(32, in_channels, kernel_size=4, stride=2, padding=1),
-            nn.Tanh()
-        )
-    
-    def forward(self, x):
-        z = self.encoder(x)
-        z_q, vq_loss = self.quantizer(z)
-        x_recon = self.decoder(z_q)
-        return x_recon, vq_loss
-
-# Обучение модели
-model = VQVAE().to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
-dataset = AudioDataset('/content/C418_samples')
-dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-
-for epoch in range(epochs):
-    total_loss = 0
-    with tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}") as pbar:
-        for x in pbar:
-            x = x.to(device)
-            x_recon, vq_loss = model(x)
-            loss = F.mse_loss(x_recon, x) + vq_loss
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-            total_loss += loss.item()
-            pbar.set_postfix(loss=loss.item())
-    print(f"Epoch {epoch+1}, Avg Loss: {total_loss / len(dataloader)}")
-
-torch.save(model.state_dict(), '/content/vqvae_model.pth')
->>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526

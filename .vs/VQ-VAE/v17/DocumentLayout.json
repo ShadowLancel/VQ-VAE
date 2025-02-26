@@ -18,12 +18,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -32,7 +28,7 @@
               "RelativeDocumentMoniker": "VQ-VAE\\VQ_VAE.py",
               "ToolTip": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\VQ_VAE.py",
               "RelativeToolTip": "VQ-VAE\\VQ_VAE.py",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJwAAAA3AAAAAAAAAA==",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAIwIAAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
               "WhenOpened": "2025-02-26T06:36:03.927Z",
               "EditorCaption": ""
@@ -47,8 +43,7 @@
               "RelativeToolTip": "VQ-VAE\\MySamples.py",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAA7AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
-              "WhenOpened": "2025-02-26T06:36:07.961Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-26T06:36:07.961Z"
             }
           ]
         }
