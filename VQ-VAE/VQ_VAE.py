@@ -1,4 +1,3 @@
-from MySamples import duration, target_dir, target_sr
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,8 +12,8 @@ num_embeddings = 512
 commitment_cost = 0.25
 target_sr = 44100
 duration = 4
-batch_size = 32
-epochs = 10
+batch_size = 16
+epochs = 20
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def load_audio(file_path):
@@ -95,7 +94,6 @@ for epoch in range(epochs):
             x = x.to(device)
             x_recon, vq_loss = model(x)
             loss = F.mse_loss(x_recon, x) + vq_loss
-            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
             total_loss += loss.item()
