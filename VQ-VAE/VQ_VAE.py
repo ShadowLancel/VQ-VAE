@@ -5,10 +5,12 @@ import torchaudio
 import os
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.utils.data import random_split, DataLoader
 
 # Гиперпараметры
 latent_dim = 64
-num_embeddings = 512
+num_embeddings = 1024
 commitment_cost = 0.25
 target_sr = 44100
 duration = 4
@@ -26,7 +28,7 @@ def load_audio(file_path):
 class AudioDataset(Dataset):
     def __init__(self, root_dir):
         self.files = [os.path.join(root_dir, f) for f in os.listdir(root_dir) if f.endswith('.wav')]
-    
+
     def __len__(self):
         return len(self.files)
 
@@ -43,10 +45,10 @@ class VectorQuantizer(nn.Module):
         self.commitment_cost = commitment_cost
         self.embeddings = nn.Embedding(num_embeddings, embedding_dim)
         self.embeddings.weight.data.uniform_(-1.0 / num_embeddings, 1.0 / num_embeddings)
-    
+
     def forward(self, x):
         x_flat = x.permute(0, 2, 1).reshape(-1, self.embedding_dim)  # [B*T, D]
-        distances = (torch.sum(x_flat ** 2, dim=1, keepdim=True) 
+        distances = (torch.sum(x_flat ** 2, dim=1, keepdim=True)
                      + torch.sum(self.embeddings.weight ** 2, dim=1)
                      - 2 * torch.matmul(x_flat, self.embeddings.weight.t()))
         encoding_indices = torch.argmin(distances, dim=1)
@@ -60,8 +62,10 @@ class VQVAE(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv1d(in_channels, 32, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.Dropout(p=0.2),
             nn.Conv1d(32, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.Dropout(p=0.2),
             nn.Conv1d(64, latent_dim, kernel_size=4, stride=2, padding=1),
             nn.ReLU()
         )
@@ -69,19 +73,39 @@ class VQVAE(nn.Module):
         self.decoder = nn.Sequential(
             nn.ConvTranspose1d(latent_dim, 64, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.Dropout(p=0.2),
             nn.ConvTranspose1d(64, 32, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
+            nn.Dropout(p=0.2),
             nn.ConvTranspose1d(32, in_channels, kernel_size=4, stride=2, padding=1),
             nn.Tanh()
         )
-    
+
     def forward(self, x):
         z = self.encoder(x)
         z_q, vq_loss = self.quantizer(z)
+        z_q = F.normalize(z_q, dim=-1)
         x_recon = self.decoder(z_q)
-        return x_recon, vq_loss
+        return x_recon, vq_loss, z_q
 
-# Обучение модели
+def compute_cosine_similarity(original, reconstructed):
+    original = original.flatten(start_dim=1)  # [B, T]
+    reconstructed = reconstructed.flatten(start_dim=1)  # [B, T]
+    return F.cosine_similarity(original, reconstructed, dim=1).mean().item()
+
+def validate(model, val_loader, criterion):
+    model.eval()
+    val_loss, val_cosine = 0, 0
+    with torch.no_grad():
+        for x in val_loader:
+            x = x.to(device)
+            x_recon, vq_loss, _ = model(x)
+            loss = criterion(x_recon, x) + vq_loss
+            val_loss += loss.item()
+            cosine_sim = compute_cosine_similarity(x, x_recon)
+            val_cosine += cosine_sim
+    return val_loss / len(val_loader), val_cosine / len(val_loader)
+
 model = VQVAE().to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 scheduler = CosineAnnealingLR(optimizer, T_max=10)
@@ -109,17 +133,25 @@ class EarlyStopping:
 
 early_stopping = EarlyStopping(patience=3)
 
-for epoch in range(epochs):
-    total_loss = 0
-    with tqdm(dataloader, desc=f"Epoch {epoch+1}/{epochs}") as pbar:
-        for x in pbar:
-            x = x.to(device)
-            x_recon, vq_loss = model(x)
-            loss = F.mse_loss(x_recon, x) + vq_loss
-            loss.backward()
-            optimizer.step()
-            total_loss += loss.item()
-            pbar.set_postfix(loss=loss.item())
-    print(f"Epoch {epoch+1}, Avg Loss: {total_loss / len(dataloader)}")
-
-torch.save(model.state_dict(), '/content/vqvae_model.pth')
+for epoch in range(20):
+    model.train()
+    train_loss, train_cosine = 0, 0
+    for x in train_loader:
+        x = x.to(device)
+        optimizer.zero_grad()
+        x_recon, vq_loss, _ = model(x)
+        loss = F.mse_loss(x_recon, x) + vq_loss
+        loss.backward()
+        optimizer.step()
+        train_loss += loss.item()
+        train_cosine += compute_cosine_similarity(x, x_recon)
+    val_loss, val_cosine = validate(model, val_loader, F.mse_loss)
+    scheduler.step()
+    if early_stopping.check(val_loss):
+        print(f"Early stopping on {epoch + 1} epoch.")
+        break
+    print(f"Epoch {epoch+1}: Train Loss: {train_loss/len(train_loader):.6f}, Train Cosine: {train_cosine/len(train_loader):.6f}")
+    print(f"           Val Loss: {val_loss:.6f}, Val Cosine: {val_cosine:.6f}")
+    if epoch % 5 == 0:
+        torch.save(model.state_dict(), f'vqvae_model_{epoch}.pth')
+torch.save(model.state_dict(), 'final_vqvae_model.pth')
