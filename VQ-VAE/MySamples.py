@@ -1,11 +1,21 @@
+<<<<<<< HEAD
+=======
+# prompt: Создание датасета сэмплов аудио, sr исходных аудио = 44100, duration сэмплов сделать равным 4 секунды, директория исходных аудио /content/drive/MyDrive/C418 , сохранять сэмплы в директорию /content/C418_samples
+
+>>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
 import librosa
 import soundfile as sf
 import os
 import numpy as np
 
 # Define paths
+<<<<<<< HEAD
 source_dir = r'D:\output_flac'
 target_dir = r'E:\C418_all'
+=======
+source_dir = '/content/drive/MyDrive/C418'
+target_dir = '/content/C418_samples'
+>>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
 target_sr = 44100
 duration = 4
 
@@ -15,7 +25,11 @@ if not os.path.exists(target_dir):
 
 # Iterate through audio files in source directory
 for filename in os.listdir(source_dir):
+<<<<<<< HEAD
     if filename.endswith('.flac'):
+=======
+    if filename.endswith(('.wav', '.mp3', '.flac')): # Add more formats if needed
+>>>>>>> 634cff2ecf68ad027f8031f64fb117b478618526
         filepath = os.path.join(source_dir, filename)
 
         try:

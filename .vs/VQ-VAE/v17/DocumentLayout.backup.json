@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{206E29AA-0CB1-481B-BE07-888E7D9E4F72}|VQ-VAE\\VQ-VAE.pyproj|C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\VQ_VAE.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{206E29AA-0CB1-481B-BE07-888E7D9E4F72}|VQ-VAE\\VQ-VAE.pyproj|solutionrelative:VQ-VAE\\VQ_VAE.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{206E29AA-0CB1-481B-BE07-888E7D9E4F72}|VQ-VAE\\VQ-VAE.pyproj|C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\MySamples.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{206E29AA-0CB1-481B-BE07-888E7D9E4F72}|VQ-VAE\\VQ-VAE.pyproj|solutionrelative:VQ-VAE\\MySamples.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "VQ_VAE.py",
+              "DocumentMoniker": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\VQ_VAE.py",
+              "RelativeDocumentMoniker": "VQ-VAE\\VQ_VAE.py",
+              "ToolTip": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\VQ_VAE.py",
+              "RelativeToolTip": "VQ-VAE\\VQ_VAE.py",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJwAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-02-26T06:36:03.927Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MySamples.py",
+              "DocumentMoniker": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\MySamples.py",
+              "RelativeDocumentMoniker": "VQ-VAE\\MySamples.py",
+              "ToolTip": "C:\\Users\\ShadowLancel\\source\\repos\\VQ-VAE\\VQ-VAE\\MySamples.py",
+              "RelativeToolTip": "VQ-VAE\\MySamples.py",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAA7AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002457|",
+              "WhenOpened": "2025-02-26T06:36:07.961Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
